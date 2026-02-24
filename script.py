@@ -97,7 +97,7 @@ def get_data(symbol, interval, limit=100):
         df['ATR'] = ta.atr(df['high'], df['low'], df['close'], length=14)
         df['ATR_PCT'] = (df['ATR'] / df['close']) * 100
         
-        df.ta.vwap(append=True)
+        df.ta.vwap(anchor="D", append=True)
         
         # Eliminamos NaNs pero verificamos que aún tengamos suficientes velas para analizar
         df.dropna(inplace=True)
@@ -223,7 +223,7 @@ def analyze_symbol(symbol, usdt_balance):
                     f"🚪 **Entrada:** ${entry_price:.7f}\n"
                     f"🔢 **CANTIDAD:** {cantidad_monedas:.2f}\n"
                     f"🛑 **StopLoss:** ${sl_price:.7f} (-{pct_sl:.2f}%)\n"
-                    f"🎯 **TakeProfit ({RISK_REWARD}R):** ${tp_price:.7f}\n"
+                    f"🎯 **TakeProfit:** ${tp_price:.7f}\n"
                     f"💰 **Capital Riesgo:** ${risk_amount:.2f}\n\n"
                     
                     f"🧡 **BTC Context (3m):** {btc_ctx}\n"
