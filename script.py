@@ -76,7 +76,7 @@ def get_orderbook_force(symbol):
     except:
         return 1.0
 
-def get_data(symbol, interval, limit=100):
+def get_data(symbol, interval, limit=500):
     try:
         klines = client.futures_klines(symbol=symbol, interval=interval, limit=limit)
         # Verificación básica de longitud
