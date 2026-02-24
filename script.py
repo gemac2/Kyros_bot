@@ -218,22 +218,22 @@ def analyze_symbol(symbol, usdt_balance):
                 msg = (
                     f"⚡ **KAIROS SNIPER V6** ⚡\n"
                     f"💎 **Moneda:** #{symbol}\n"
-                    f"📊 **Tipo:** {signal_type}\n"
+                    f"📊 **Tipo:** {signal_type}\n\n"
 
                     f"🚪 **Entrada:** ${entry_price:.7f}\n"
-                    f"🔢 **CANTIDAD:** {cantidad_monedas:.2f}\n\n"
+                    f"🔢 **CANTIDAD:** {cantidad_monedas:.2f}\n"
                     f"🛑 **StopLoss:** ${sl_price:.7f} (-{pct_sl:.2f}%)\n"
-                    f"🎯 **TakeProfit ({RISK_REWARD}R):** ${tp_price:.7f}\n\n"
+                    f"🎯 **TakeProfit ({RISK_REWARD}R):** ${tp_price:.7f}\n"
                     f"💰 **Capital Riesgo:** ${risk_amount:.2f}\n\n"
                     
                     f"🧡 **BTC Context (3m):** {btc_ctx}\n"
                     f"📈 **Open Interest:** {oi_ctx}\n"
                     f"📈 **ATR Volatilidad:** {val_atr_pct:.2f}%\n"
-                    f"⚖️ **Presion del Libro:** {force_ratio:.2f}"
+                    f"⚖️ **Presion del Libro:** {force_ratio:.2f}\n\n"
                     
                     f"🌊 **VWAP:** ${val_vwap:.7f}\n"
                     f"📉 **EMA 7:** ${val_ema7:.7f}\n"
-                    f"📉 **EMA 25:** ${val_ema25:.7f}\n"
+                    f"📉 **EMA 25:** ${val_ema25:.7f}"
                 )
                 
                 send_telegram_alert(msg)
