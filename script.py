@@ -132,6 +132,24 @@ def get_btc_status():
     except:
         return "Indeterminado"
 
+def get_oi_analysis(symbol):
+    """Analiza la tendencia del Open Interest en los últimos 15 min (5 velas de 3m)."""
+    try:
+        # Obtenemos historial de OI (periodo de 3m para coincidir con tu entrada)
+        oi_hist = client.futures_open_interest_hist(symbol=symbol, period='3m', limit=5)
+        if len(oi_hist) < 2: return "Estable"
+
+        oi_actual = float(oi_hist[-1]['sumOpenInterest'])
+        oi_inicio = float(oi_hist[0]['sumOpenInterest'])
+        
+        oi_change_pct = ((oi_actual - oi_inicio) / oi_inicio) * 100
+
+        if oi_change_pct > 0.8: return f"FUERTE ENTRADA 🔥 ({oi_change_pct:+.2f}%)"
+        if oi_change_pct < -0.8: return f"CIERRE/LIQUIDACIÓN 🧊 ({oi_change_pct:+.2f}%)"
+        return f"ESTABLE ({oi_change_pct:+.2f}%)"
+    except:
+        return "Sin datos"
+
 def analyze_symbol(symbol, usdt_balance):
     # Riesgo basado en el 4% del balance actual
     risk_amount = (usdt_balance if usdt_balance > 10 else 10) * 0.04 
@@ -153,6 +171,7 @@ def analyze_symbol(symbol, usdt_balance):
         vwap_col = [c for c in df_entry.columns if c.startswith('VWAP')][0]
         val_vwap = float(curr[vwap_col])
         val_ema7 = float(curr['EMA_7'])
+        val_ema25 = float(curr['EMA_25'])
         market_price = float(curr['close'])
         val_atr_pct = float(curr['ATR_PCT'])
         
@@ -190,6 +209,7 @@ def analyze_symbol(symbol, usdt_balance):
             pct_sl = (dist_sl / entry_price) * 100
             
             btc_ctx = get_btc_status()
+            oi_ctx = get_oi_analysis(symbol)
 
             # Filtro de Stop Loss racional
             if 0.3 < pct_sl < 4.5:
@@ -199,20 +219,21 @@ def analyze_symbol(symbol, usdt_balance):
                     f"⚡ **KAIROS SNIPER V6** ⚡\n"
                     f"💎 **Moneda:** #{symbol}\n"
                     f"📊 **Tipo:** {signal_type}\n"
-                    f"🧡 **BTC Context (3m):** {btc_ctx}\n"
-                    f"📈 **ATR Volatilidad:** {val_atr_pct:.2f}%\n"
-                    f"💰 **Riesgo Op:** ${risk_amount:.2f}\n\n"
-                    
+
                     f"🚪 **Entrada:** ${entry_price:.7f}\n"
-                    f"🕹️ **Modo:** {entry_type}\n"
-                    f"🛑 **SL (VWAP):** ${sl_price:.7f} (-{pct_sl:.2f}%)\n"
-                    f"🎯 **TP ({RISK_REWARD}R):** ${tp_price:.7f}\n\n"
+                    f"🔢 **CANTIDAD:** {cantidad_monedas:.2f}\n\n"
+                    f"🛑 **StopLoss:** ${sl_price:.7f} (-{pct_sl:.2f}%)\n"
+                    f"🎯 **TakeProfit ({RISK_REWARD}R):** ${tp_price:.7f}\n\n"
+                    f"💰 **Capital Riesgo:** ${risk_amount:.2f}\n\n"
+                    
+                    f"🧡 **BTC Context (3m):** {btc_ctx}\n"
+                    f"📈 **Open Interest:** {oi_ctx}\n"
+                    f"📈 **ATR Volatilidad:** {val_atr_pct:.2f}%\n"
+                    f"⚖️ **Presion del Libro:** {force_ratio:.2f}"
                     
                     f"🌊 **VWAP:** ${val_vwap:.7f}\n"
                     f"📉 **EMA 7:** ${val_ema7:.7f}\n"
-                    f"🔢 **CANTIDAD:** {cantidad_monedas:.2f}\n\n"
-                    
-                    f"⚖️ **OB Ratio:** {force_ratio:.2f}"
+                    f"📉 **EMA 25:** ${val_ema25:.7f}\n"
                 )
                 
                 send_telegram_alert(msg)
