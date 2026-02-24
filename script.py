@@ -106,6 +106,31 @@ def get_data(symbol, interval, limit=100):
         return df
     except Exception:
         return None
+    
+def get_btc_status():
+    try:
+        # Analizamos BTC en el timeframe de entrada (3m)
+        df_btc = get_data("BTCUSDT", TIMEFRAME_ENTRY, limit=50)
+        if df_btc is None or len(df_btc) < 2:
+            return "Buscando datos..."
+
+        curr = df_btc.iloc[-1]
+        prev = df_btc.iloc[-2]
+        
+        # Calculamos cambio porcentual simple en la última vela
+        change = ((curr['close'] - prev['close']) / prev['close']) * 100
+        
+        # Determinamos tendencia por EMAs en 3m
+        if curr['EMA_7'] > curr['EMA_25']:
+            trend = "ALCISTA 🟢"
+        elif curr['EMA_7'] < curr['EMA_25']:
+            trend = "BAJISTA 🔴"
+        else:
+            trend = "LATERAL 🟡"
+
+        return f"{trend} ({change:+.2f}%)"
+    except:
+        return "Indeterminado"
 
 def analyze_symbol(symbol, usdt_balance):
     # Riesgo basado en el 4% del balance actual
@@ -164,6 +189,8 @@ def analyze_symbol(symbol, usdt_balance):
             dist_sl = abs(entry_price - sl_price)
             pct_sl = (dist_sl / entry_price) * 100
             
+            btc_ctx = get_btc_status()
+
             # Filtro de Stop Loss racional
             if 0.3 < pct_sl < 4.5:
                 cantidad_monedas = risk_amount / dist_sl
@@ -172,6 +199,7 @@ def analyze_symbol(symbol, usdt_balance):
                     f"⚡ **KAIROS SNIPER V6** ⚡\n"
                     f"💎 **Moneda:** #{symbol}\n"
                     f"📊 **Tipo:** {signal_type}\n"
+                    f"🧡 **BTC Context (3m):** {btc_ctx}\n"
                     f"📈 **ATR Volatilidad:** {val_atr_pct:.2f}%\n"
                     f"💰 **Riesgo Op:** ${risk_amount:.2f}\n\n"
                     
