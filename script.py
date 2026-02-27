@@ -152,7 +152,7 @@ def get_oi_analysis(symbol):
 
 def analyze_symbol(symbol, usdt_balance):
     # Riesgo basado en el 4% del balance actual
-    risk_amount = (usdt_balance if usdt_balance > 10 else 10) * 0.04 
+    risk_amount = (usdt_balance if usdt_balance > 10 else 10) * 0.03 
 
     df_entry = get_data(symbol, TIMEFRAME_ENTRY)
     df_trend = get_data(symbol, TIMEFRAME_TREND)
